@@ -318,5 +318,14 @@ int main (int argc, char** argv) {
     delete about_ptr;
     delete bus_ptr;
 
+    cout << "\n\t Shutting down AllJoyn...\n";
+    obs_ptr->UnregisterAllListeners ();
+
+    #ifdef ROUTER
+        AllJoynRouterShutdown ();
+    #endif // ROUTER
+
+    AllJoynShutdown ();
+
     return EXIT_SUCCESS;
 } // end main
