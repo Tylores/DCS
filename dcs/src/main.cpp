@@ -39,7 +39,7 @@
 
 #include "include/ts_utility.hpp"
 #include "include/aj_utility.hpp"
-#include "include/Resource.hpp"
+#include "include/DistributedEnergyResource.hpp"
 #include "include/ServerListener.hpp"
 #include "include/SmartGridDevice.hpp"
 
@@ -258,6 +258,9 @@ int main (int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    cout << "\n\t\tLooking for resource...\n";
+    DistributedEnergyResource *der_ptr = new DistributedEnergyResource ();
+
     cout << "\n\t\tCreating observer...\n";
     string server_interface = tsu::GetSectionProperty(ini_map,
                                                       "AllJoyn",
@@ -280,7 +283,10 @@ int main (int argc, char** argv) {
     string path_str = tsu::GetSectionProperty(ini_map, "AllJoyn", "path");
     const char *path = path_str.c_str();
 
-    SmartGridDevice *sgd_ptr = new SmartGridDevice(bus_ptr, device_name, path);
+    SmartGridDevice *sgd_ptr = new SmartGridDevice(der_ptr, 
+                                                   bus_ptr, 
+                                                   device_name, 
+                                                   path);
 
     cout << "\n\t\t\tRegistering bus object...\n";
     if (ER_OK != bus_ptr->RegisterBusObject(*sgd_ptr)){
@@ -289,13 +295,6 @@ int main (int argc, char** argv) {
         return EXIT_FAILURE;
     }
     about_ptr->Announce(port, about_data);
-
-    cout << "\n\t\tLooking for resource...\n";
-    // string driver = parameters.at("driver");
-    // string model = parameters.at("model");
-    // unsigned int time_mult = stoul(parameters.at("time"))/60;
-    // TODO (TS): add logic to default to simulated DER if config is NULL;
-    Resource *der_ptr = new Resource ();
 
     cout << "\nProgram initialization complete...\n";
     thread CLI(InterfaceLoop, der_ptr);

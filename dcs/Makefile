@@ -30,11 +30,8 @@ LIB := -lstdc++ -lpthread -lrt -lm $(PILIBS)
 INC := -I src/include
 
 # AllJoyn Requirments
-ifeq ($(SECURE), secure)
-	AJFLAGS := -DROUTER -DSECURE
-else
-	AJFLAGS := -DROUTER
-endif
+AJFLAGS := -DROUTER
+
 CFLAGS += $(AJFLAGS)
 LIB += -L$(AJLIB) -lalljoyn -lajrouter
 INC += -I$(AJINC)

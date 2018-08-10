@@ -25,33 +25,30 @@
 #ifndef SMARTGRIDDEVICE_HPP_INCLUDED
 #define SMARTGRIDDEVICE_HPP_INCLUDED
 
-struct PowerStatus {
-    int battery_status;
-    unsigned int changed_time;
-    int charging_power;
-    int energy_request;
-};
+#include "DistributedEnergyResource.hpp"
 
 class SmartGridDevice : public ajn::BusObject {
-public :
-    // member properties
-    ajn::BusAttachment* bus_;
-    const char* interface_;
-    const ajn::InterfaceDescription::Member* signal_;
-    std::string name_;
-    PowerStatus power_status_;
-
 public:
     // member methods
-    SmartGridDevice (ajn::BusAttachment* bus_ptr,
-                     const char* name,
+    SmartGridDevice (DistributedEnergyResource* der,
+                     ajn::BusAttachment* bus, 
+                     const char* name, 
                      const char* path);
-    QStatus SetPowerStatus (ajn::MsgArg* arg_ptr);
-    void UpdatePowerStatus (unsigned int time,
-                            int ev_state,
-                            int ev_power,
-                            int ev_energy);
-    QStatus Get (const char* intf, const char* propName, ajn::MsgArg& val);
+    void ImportPowerHandler (ajn::InterfaceDescription::Member* member,
+                             ajn::Message& message);
+    void ExportPowerHandler (ajn::InterfaceDescription::Member* member,
+                             ajn::Message& message);
+    QStatus Get (const char* interface, 
+                 const char* property, 
+                 ajn::MsgArg& value);
+
+private:
+    // member properties
+    DistributedEnergyResource* der_;
+    ajn::BusAttachment* bus_;
+    const char* interface_;
+    const char* name_;
+    const ajn::InterfaceDescription::Member* signal_;
 
 };
 

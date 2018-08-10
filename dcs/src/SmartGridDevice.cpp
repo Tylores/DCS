@@ -1,111 +1,92 @@
-#include <string>
-
 #include <alljoyn/BusObject.h>
 #include <alljoyn/BusAttachment.h>
 
 #include "include/SmartGridDevice.hpp"
-#include "include/ts_utility.hpp"
 
 // Constructor
 // - initialize bus object interface and smart grid device properties
-SmartGridDevice::SmartGridDevice (ajn::BusAttachment* bus_ptr,
+SmartGridDevice::SmartGridDevice (DistributedEnergyResource* der,
+                                  ajn::BusAttachment* bus,
                                   const char* name,
                                   const char* path) : ajn::BusObject(path),
-                                                      bus_(bus_ptr),
+                                                      der_(der),
+                                                      bus_(bus),
                                                       interface_(name),
                                                       signal_(NULL) {
-    const ajn::InterfaceDescription* intf = bus_->GetInterface(interface_);
-    assert(intf != NULL);
-    AddInterface(*intf, ANNOUNCED);
+    const ajn::InterfaceDescription* interface = bus_->GetInterface(interface_);
+    assert(interface != NULL);
+    AddInterface(*interface, ANNOUNCED);
+
+    const ajn::BusObject::MethodEntry methods[] = {{
+            interface->GetMember("ImportPower"), 
+            static_cast <ajn::MessageReceiver::MethodHandler>
+            (&SmartGridDevice::ImportPowerHandler)
+        }, {
+            interface->GetMember("ExportPower"), 
+            static_cast <ajn::MessageReceiver::MethodHandler>
+            (&SmartGridDevice::ExportPowerHandler)
+        }
+
+    }
+
+    size_t count = sizeof (methods) / sizeof (methods[0]);
+    QStatus status = AddMethodHandlers (methods, count);
+    if (ER_OK != status) {
+        throw status;
+    }
 }
 
-// SetPowerStatus
-// - update PowerStatus values with most recent updates
-QStatus SmartGridDevice::SetPowerStatus (ajn::MsgArg* arg_ptr) {
-    ajn::MsgArg& arg_ref = *arg_ptr;  // deref pointer
+// Import Power Handler
+// - called by remote consumer and sends the watt value for import
+void SmartGridDevice::ImportPowerHandler (
+        const InterfaceDescription::Member* member,
+        Message& message) {
+    ajn::QCC_UNUSED (member);
+    der_->SetImportWatts (message->GetArg(0)-v_uint32);
+}  // end Import Power Handler
 
-    // init MsgArg dictionary
-    std::string name;
-    size_t items = 4;
-    ajn::MsgArg dict[items];
-
-    name = "batteryStatus";
-    dict[0].Set("{sv}", name.c_str(), power_status_.battery_status);
-
-    name = "changedTime";
-    dict[1].Set("{sv}", name.c_str(), power_status_.changed_time);
-
-    name = "chargingPowerNow";
-    dict[2].Set("{sv}", name.c_str(), power_status_.charging_power);
-
-    name = "energyRequestNow";
-    dict[3].Set("{sv}", name.c_str(), power_status_.energy_request);
-
-    // pack dictionary into the alljoyn message that will be sent
-    QStatus status = arg_ref.Set("a{sv}", items, &dict);
-    return status;
-} // end SetPowerStatus
-
-// UpdatePowerStatus
-// - send a power status changed signal to remote devices
-void SmartGridDevice::UpdatePowerStatus (unsigned int time,
-                                         int ev_state,
-                                         int ev_power,
-                                         int ev_energy) {
-    enum {UNKNOWN, NORMAL, LOW, DEPLETED, NA};  // battery states
-    enum {IDLE, CHARGING, DISCHARGING, DRIVING, DEAD};  // EV states
-
-    // init PowerStatus values
-    int state = ev_state;
-    int battery;
-    unsigned int power = 0;
-    switch (state) {
-        case IDLE: battery = NORMAL;
-        case CHARGING:
-            battery = NORMAL;
-            power = ev_power;
-        case DISCHARGING: battery = NORMAL;
-        case DRIVING: battery = UNKNOWN;
-        case DEAD: battery = DEPLETED;
-    }
-
-    power_status_.battery_status = battery;
-    power_status_.changed_time = time;
-    power_status_.charging_power = power;
-    power_status_.energy_request = ev_energy;
-
-    ajn::MsgArg val;
-    const char* name = "PowerStatus";
-    QStatus status = SmartGridDevice::SetPowerStatus(&val);
-    if (status != ER_OK) {
-        std::printf("[ERROR] setting PowerStatus MsgArg!\n");
-    } else {
-        name = "PowerStatus";
-        //EmitPropChanged(interface_, name, val, ajn::SESSION_ID_ALL_HOSTED);
-    }
-} // end UpdateProperties
+// Export Power Handler
+// - called by remote consumer and sends the watt value for export
+void SmartGridDevice::ExportPowerHandler (
+        const InterfaceDescription::Member* member,
+        Message& message) {
+    ajn::QCC_UNUSED (member);
+    der_->SetExportWatts (message->GetArg(0)-v_uint32);
+}  // end Export Power Handler
 
 // Get
 // - this method will be called by remote devices looking to get this devices
 // - properties
-QStatus SmartGridDevice::Get (const char* intf,
-                              const char* propName,
-                              ajn::MsgArg& val) {
+QStatus SmartGridDevice::Get (const char* interface,
+                              const char* property,
+                              ajn::MsgArg& value) {
     QStatus status;
-    if (strcmp(intf, interface_)) {
+    if (strcmp(interface, interface_)) {
         return ER_FAIL;
     }
 
-    if (!strcmp(propName,"AssetName")) {
-        status = val.Set("s", propName);
+    if (!strcmp(property,"import_power")) {
+        status = value.Set("u", der_->GetImportPower ());
         return status;
-    } else if (!strcmp(propName, "PowerStatus")) {
-        ajn::MsgArg arg;
-        status = SmartGridDevice::SetPowerStatus(&arg);
-        status = val.Set("a{sv}", arg);
+    } else if (!strcmp(property,"import_energy")) {
+        status = value.Set("u", der_->GetImportEnergy ());
+        return status;
+    } else if (!strcmp(property,"import_ramp")) {
+        status = value.Set("u", der_->GetImportRamp ());
+        return status;
+    }else if (!strcmp(property,"export_power")) {
+        status = value.Set("u", der_->GetExportPower ());
+        return status;
+    } else if (!strcmp(property,"export_energy")) {
+        status = value.Set("u", der_->GetExportEnergy ());
+        return status;
+    } else if (!strcmp(property,"export_ramp")) {
+        status = value.Set("u", der_->GetExportRamp ());
+        return status;
+    } else if (!strcmp(property,"idle_losses")) {
+        status = value.Set("u", der_->GetIdleLosses ());
         return status;
     } else {
-        std::printf("[ERROR] unknown property!\n");
         return ER_FAIL;
     }
 } // end Get

@@ -31,11 +31,6 @@
 #include <alljoyn/Observer.h>
 #include <alljoyn/Init.h>
 
-#ifdef SECURE
-    #include <alljoyn/AuthListener.h>
-    #include <alljoyn/Log.h>
-#endif // SECURE
-
 #include "ts_utility.hpp"
 
 namespace aj_utility {
@@ -61,33 +56,103 @@ static QStatus BuildDeviceInterface (std::string name,
     ajn::BusAttachment& bus_ref = *bus_ptr;  // deref pointer
     ajn::InterfaceDescription* interface = NULL;
 
-    printf("\n\t\t\t\tCreating blank interface for %s...\n",interface_name);
-    #ifdef SECURE
-        status = bus_ref.CreateInterface (interface_name, interface,true);
-        assert (status == ER_OK);
-    #else
-        status = bus_ref.CreateInterface(interface_name, interface);
-        assert (status == ER_OK);
-    #endif // SECURE
+    printf("\n\t\t\t\tCreating interface for %s...\n",interface_name);
 
-    printf("\n\t\t\t\tAdding properties...\n");
-    status = interface->AddProperty("AssetName", "s", ajn::PROP_ACCESS_READ);
+    // methods
+    status = interface->AddMethod("ImportPower", 
+                                  "u", 
+                                  NULL, 
+                                  "watts", 
+                                  MEMBER_ANNOTATE_NO_REPLY);
     assert (status == ER_OK);
 
-    status = interface->AddPropertyAnnotation(
-        "AssetName",
-        "org.freedesktop.DBus.Property.EmitsChangedSignal",
-        "const"
-    );
+    status = interface->AddMethod("ExportPower", 
+                                  "u", 
+                                  NULL, 
+                                  "watts", 
+                                  MEMBER_ANNOTATE_NO_REPLY);
     assert (status == ER_OK);
 
-    status = interface->AddProperty("PowerStatus",
-                                    "a{sv}",
+    // properties
+    status = interface->AddProperty("export_power",
+                                    "u",
                                     ajn::PROP_ACCESS_READ);
     assert (status == ER_OK);
 
     status = interface->AddPropertyAnnotation(
-        "PowerStatus",
+        "export_power",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("export_energy",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "export_energy",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("export_ramp",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "export_ramp",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("import_power",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "import_power",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("import_energy",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "import_energy",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("import_ramp",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "import_ramp",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("idle_losses",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "idle_losses",
         "org.freedesktop.DBus.Property.EmitsChangedSignal",
         "true"
     );
@@ -109,40 +174,13 @@ static QStatus BuildServerInterface (std::string name,
     ajn::InterfaceDescription* interface = NULL;
 
     printf("\n\t\t\t\tCreating blank interface for %s...\n",interface_name);
-    #ifdef SECURE
-        status = bus_ref.CreateInterface (interface_name, interface, true);
-        assert (status = ER_OK);
-    #else
-        status = bus_ref.CreateInterface(interface_name, interface);
-        assert (status == ER_OK);
-    #endif // SECURE
 
-    printf("\n\t\t\t\tAdding properties...\n");
-    status = interface->AddProperty("EMSName", "s", ajn::PROP_ACCESS_READ);
+    // properties
+    status = interface->AddProperty("time", "u", ajn::PROP_ACCESS_READ);
     assert (status == ER_OK);
 
     status = interface->AddPropertyAnnotation(
-        "EMSName",
-        "org.freedesktop.DBus.Property.EmitsChangedSignal",
-        "const"
-    );
-    assert (status == ER_OK);
-
-    status = interface->AddProperty("Time", "u", ajn::PROP_ACCESS_READ);
-    assert (status == ER_OK);
-
-    status = interface->AddPropertyAnnotation(
-        "Time",
-        "org.freedesktop.DBus.Property.EmitsChangedSignal",
-        "true"
-    );
-    assert (status == ER_OK);
-
-    status = interface->AddProperty("price", "i", ajn::PROP_ACCESS_READ);
-    assert (status == ER_OK);
-
-    status = interface->AddPropertyAnnotation(
-        "price",
+        "time",
         "org.freedesktop.DBus.Property.EmitsChangedSignal",
         "true"
     );
