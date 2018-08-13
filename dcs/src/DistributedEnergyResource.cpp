@@ -2,19 +2,19 @@
 
 DistributedEnergyResource::DistributedEnergyResource (
     std::map <std::string, std::string> init) :
-    rated_import_power_(init["ImportPower"]),
-    rated_export_power_(init["ImportPower"]),
-    rated_import_energy_(init["ImportPower"]),
-    rated_export_energy_(init["ImportPower"]),
-    import_ramp_(init["ImportPower"]),
-    export_ramp_(init["ImportPower"]),
-    idle_losses_(init["ImportPower"]),
-    import_power_(init["ImportPower"]),
-    export_power_(init["ImportPower"]),
-    import_energy_(init["ImportPower"]),
-    export_energy_(init["ImportPower"]),
-    import_watts_(init["ImportPower"]),
-    export_watts_(init["ImportPower"]),
+    rated_export_power_(stoul(init["ExportPower"])),
+    rated_export_energy_(stoul(init["ExportEnergy"])),
+    export_ramp_(stoul(init["ExportRamp"])),
+    rated_import_power_(stoul(init["ImportPower"])),
+    rated_import_energy_(stoul(init["ImportEnergy"])),
+    import_ramp_(stoul(init["ImportRamp"])),
+    idle_losses_(stoul(init["IdleLosses"])),
+    export_power_(0),
+    export_energy_(rated_export_energy_),
+    import_power_(0),
+    import_energy_(0),
+    export_watts_(0),
+    import_watts_(0),
     delta_time_(0) {
     //ctor
 }
@@ -93,10 +93,18 @@ unsigned int DistributedEnergyResource::GetRatedExportPower () {
     return rated_export_power_;
 }  // end Get Rated Export Power
 
-// Get Rated Export Energy
+// Get Export Power
+// - get the watt value available to export to the grid
+unsigned int DistributedEnergyResource::GetExportPower () {
+    unsigned int power = export_power_;
+    return power;
+}  // end Get Export Power
+
+// Get Export Energy
 // - get the watt-hour value available to export to the grid
-unsigned int DistributedEnergyResource::GetRatedExportEnergy () {
-    return rated_export_energy_;
+unsigned int DistributedEnergyResource::GetExportEnergy () {
+    unsigned int energy = export_energy_;
+    return energy;
 }  // end Get Export Energy
 
 // Get Export Ramp
@@ -105,22 +113,24 @@ unsigned int DistributedEnergyResource::GetExportRamp () {
     return export_ramp_;
 }  // end Get Export Ramp
 
-// Get Import Watts
-// - get the import control property used in the control loop
-unsigned int DistributedEnergyResource::GetImportWatts () {
-    return import_watts_;
-}  // end Get Import Watts
-
 // Get Rated Import Power
 // - get the watt value available to import from the grid
 unsigned int DistributedEnergyResource::GetRatedImportPower () {
     return rated_import_power_;
 }  // end Rated Import Power
 
-// Get Rated Import Energy
+// Get Import Power
+// - get the watt value available to import from the grid
+unsigned int DistributedEnergyResource::GetImportPower () {
+    unsigned int power = import_power_;
+    return power;
+}  // end Get Import Power
+
+// Get Import Energy
 // - get the watt-hour value available to import from the grid
-unsigned int DistributedEnergyResource::GetRatedImportEnergy () {
-    return rated_import_energy_;
+unsigned int DistributedEnergyResource::GetImportEnergy () {
+    unsigned int energy = import_energy_;
+    return energy;
 }  // end Get Import Energy
 
 // Get Import Ramp
@@ -207,13 +217,13 @@ void DistributedEnergyResource::IdleLoss () {
 
 // Control
 // - check state of import / export power properties from main loop on a timer
-void DistributedEnergyResource::Loop (unsigned int delta_time) {
+void DistributedEnergyResource::Loop (float delta_time) {
     delta_time_ = delta_time;
 
     if (import_watts_ > 0) {
-        Resource::ImportPower ();
+        DistributedEnergyResource::ImportPower ();
     } else if (export_watts_ > 0) {
-        Resource::ExportPower ();
+        DistributedEnergyResource::ExportPower ();
     } else {
         IdleLoss ();
     }

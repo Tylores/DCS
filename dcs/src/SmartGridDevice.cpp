@@ -1,5 +1,7 @@
+#include <alljoyn/Status.h>
 #include <alljoyn/BusObject.h>
 #include <alljoyn/BusAttachment.h>
+
 
 #include "include/SmartGridDevice.hpp"
 
@@ -19,15 +21,15 @@ SmartGridDevice::SmartGridDevice (DistributedEnergyResource* der,
 
     const ajn::BusObject::MethodEntry methods[] = {{
             interface->GetMember("ImportPower"), 
-            static_cast <ajn::MessageReceiver::MethodHandler>
+            static_cast <ajn::BusObject::MessageReceiver::MethodHandler>
             (&SmartGridDevice::ImportPowerHandler)
         }, {
             interface->GetMember("ExportPower"), 
-            static_cast <ajn::MessageReceiver::MethodHandler>
+            static_cast <ajn::BusObject::MessageReceiver::MethodHandler>
             (&SmartGridDevice::ExportPowerHandler)
-        }
+        },
 
-    }
+    };
 
     size_t count = sizeof (methods) / sizeof (methods[0]);
     QStatus status = AddMethodHandlers (methods, count);
@@ -39,19 +41,19 @@ SmartGridDevice::SmartGridDevice (DistributedEnergyResource* der,
 // Import Power Handler
 // - called by remote consumer and sends the watt value for import
 void SmartGridDevice::ImportPowerHandler (
-        const InterfaceDescription::Member* member,
-        Message& message) {
-    ajn::QCC_UNUSED (member);
-    der_->SetImportWatts (message->GetArg(0)-v_uint32);
+        const ajn::InterfaceDescription::Member* member,
+        ajn::Message& message) {
+    (void)member;
+    der_->SetImportWatts (message->GetArg(0)->v_uint32);
 }  // end Import Power Handler
 
 // Export Power Handler
 // - called by remote consumer and sends the watt value for export
 void SmartGridDevice::ExportPowerHandler (
-        const InterfaceDescription::Member* member,
-        Message& message) {
-    ajn::QCC_UNUSED (member);
-    der_->SetExportWatts (message->GetArg(0)-v_uint32);
+        const ajn::InterfaceDescription::Member* member,
+        ajn::Message& message) {
+    (void)member;
+    der_->SetExportWatts (message->GetArg(0)->v_uint32);
 }  // end Export Power Handler
 
 // Get
@@ -66,7 +68,7 @@ QStatus SmartGridDevice::Get (const char* interface,
     }
 
     if (!strcmp(property,"import_power")) {
-        status = value.Set("u", der_->GetImportPower ());
+        status = value.Set("u", der_->GetRatedImportPower ());
         return status;
     } else if (!strcmp(property,"import_energy")) {
         status = value.Set("u", der_->GetImportEnergy ());
@@ -75,7 +77,7 @@ QStatus SmartGridDevice::Get (const char* interface,
         status = value.Set("u", der_->GetImportRamp ());
         return status;
     }else if (!strcmp(property,"export_power")) {
-        status = value.Set("u", der_->GetExportPower ());
+        status = value.Set("u", der_->GetRatedExportPower ());
         return status;
     } else if (!strcmp(property,"export_energy")) {
         status = value.Set("u", der_->GetExportEnergy ());

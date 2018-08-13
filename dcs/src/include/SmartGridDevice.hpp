@@ -34,9 +34,9 @@ public:
                      ajn::BusAttachment* bus, 
                      const char* name, 
                      const char* path);
-    void ImportPowerHandler (ajn::InterfaceDescription::Member* member,
+    void ImportPowerHandler (const ajn::InterfaceDescription::Member* member,
                              ajn::Message& message);
-    void ExportPowerHandler (ajn::InterfaceDescription::Member* member,
+    void ExportPowerHandler (const ajn::InterfaceDescription::Member* member,
                              ajn::Message& message);
     QStatus Get (const char* interface, 
                  const char* property, 

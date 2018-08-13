@@ -105,7 +105,8 @@ static map<string, string> CommandLineParse (int argc, char** argv) {
 
 // Command Line Interface
 // - method to allow user controls during program run-time
-static bool CommandLineInterface (const string& input, Resource *DER) {
+static bool CommandLineInterface (const string& input, 
+                                  DistributedEnergyResource *DER) {
     // check for program argument
     if (input == "") {
         return false;
@@ -126,7 +127,7 @@ static bool CommandLineInterface (const string& input, Resource *DER) {
 
         case 'i': {
             try {
-                DER->SetImportPower(stoul(tokens[1]));
+                DER->SetImportWatts(stoul(tokens[1]));
             } catch(...) {
                 cout << "[ERROR]: Invalid Argument." << endl;
             }
@@ -135,7 +136,7 @@ static bool CommandLineInterface (const string& input, Resource *DER) {
 
         case 'e': {
             try {
-                DER->SetExportPower(stoul(tokens[1]));
+                DER->SetExportWatts(stoul(tokens[1]));
             } catch(...) {
                 cout << "[ERROR]: Invalid Argument." << endl;
             }
@@ -143,11 +144,11 @@ static bool CommandLineInterface (const string& input, Resource *DER) {
         }
 
         case 'p': {
-            map <string, float> properties = DER->GetProperties();
             cout << "\n\t[Properties]\n\n";
-            for (const auto &value : properties) {
-                cout << value.first << '\t' << value.second << endl;
-            }
+            cout << "Export Energy:\t" << DER->GetExportEnergy () << endl;
+            cout << "Export Power:\t" << DER->GetExportPower () << endl;
+            cout << "Import Energy:\t" << DER->GetImportEnergy () << endl;
+            cout << "Import Power:\t" << DER->GetImportPower () << endl;
             break;
         }
 
@@ -160,7 +161,7 @@ static bool CommandLineInterface (const string& input, Resource *DER) {
     return false;
 }  // end Command Line Interface
 
-void InterfaceLoop (Resource *DER) {
+void InterfaceLoop (DistributedEnergyResource *DER) {
     Help ();
     string input;
 
@@ -170,7 +171,7 @@ void InterfaceLoop (Resource *DER) {
     }
 } // end Interface Loop
 
-void ResourceLoop (Resource *DER) {
+void ResourceLoop (DistributedEnergyResource *DER) {
     unsigned int time_remaining, time_past;
     unsigned int time_wait = 500;
     auto time_start = chrono::high_resolution_clock::now();
@@ -182,7 +183,7 @@ void ResourceLoop (Resource *DER) {
             // time since last control call;
             time_elapsed = time_start - time_end;
             time_past = time_elapsed.count();
-            DER->Control(time_past);
+            DER->Loop(time_past);
         time_end = chrono::high_resolution_clock::now();
         time_elapsed = time_end - time_start;
 
@@ -259,7 +260,9 @@ int main (int argc, char** argv) {
     }
 
     cout << "\n\t\tLooking for resource...\n";
-    DistributedEnergyResource *der_ptr = new DistributedEnergyResource ();
+
+    DistributedEnergyResource *der_ptr = 
+        new DistributedEnergyResource (ini_map["DER"]);
 
     cout << "\n\t\tCreating observer...\n";
     string server_interface = tsu::GetSectionProperty(ini_map,

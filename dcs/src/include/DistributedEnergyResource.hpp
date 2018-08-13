@@ -1,11 +1,16 @@
 #ifndef DISTRIBUTEDENERGYRESOURCE_H
 #define DISTRIBUTEDENERGYRESOURCE_H
 
+#include <string>
+#include <map>
+
 class DistributedEnergyResource {
     public:
         // constructor / destructor
-        DistributedEnergyResource ();
+        DistributedEnergyResource (std::map <std::string, std::string> init);
         virtual ~DistributedEnergyResource ();
+        void Loop (float delta_time);
+
 
     public:
         // set export methods        
@@ -26,11 +31,13 @@ class DistributedEnergyResource {
 
     public:
         // get export methods
+        unsigned int GetRatedExportPower ();
         unsigned int GetExportPower ();
         unsigned int GetExportEnergy ();
         unsigned int GetExportRamp ();
 
         // get import methods
+        unsigned int GetRatedImportPower ();
         unsigned int GetImportPower ();
         unsigned int GetImportEnergy ();
         unsigned int GetImportRamp ();
@@ -43,7 +50,6 @@ class DistributedEnergyResource {
         void ImportPower ();
         void ExportPower ();
         void IdleLoss ();
-        void Loop (unsigned int delta_time);
 
     private:
         // rated export properties
@@ -68,8 +74,8 @@ class DistributedEnergyResource {
 
     private:
         // control properties
-        unsigned int import_watts_;
         unsigned int export_watts_;
+        unsigned int import_watts_;
         float delta_time_;  // milliseconds
 };
 

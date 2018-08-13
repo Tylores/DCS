@@ -55,6 +55,7 @@ static QStatus BuildDeviceInterface (std::string name,
     const char* interface_name = name.c_str();
     ajn::BusAttachment& bus_ref = *bus_ptr;  // deref pointer
     ajn::InterfaceDescription* interface = NULL;
+    status = bus_ref.CreateInterface(interface_name, interface);
 
     printf("\n\t\t\t\tCreating interface for %s...\n",interface_name);
 
@@ -63,14 +64,14 @@ static QStatus BuildDeviceInterface (std::string name,
                                   "u", 
                                   NULL, 
                                   "watts", 
-                                  MEMBER_ANNOTATE_NO_REPLY);
+                                  ajn::MEMBER_ANNOTATE_NO_REPLY);
     assert (status == ER_OK);
 
     status = interface->AddMethod("ExportPower", 
                                   "u", 
                                   NULL, 
                                   "watts", 
-                                  MEMBER_ANNOTATE_NO_REPLY);
+                                  ajn::MEMBER_ANNOTATE_NO_REPLY);
     assert (status == ER_OK);
 
     // properties
@@ -172,6 +173,7 @@ static QStatus BuildServerInterface (std::string name,
     const char* interface_name = name.c_str();
     ajn::BusAttachment& bus_ref = *bus_ptr;  // deref pointer
     ajn::InterfaceDescription* interface = NULL;
+    status = bus_ref.CreateInterface(interface_name, interface);
 
     printf("\n\t\t\t\tCreating blank interface for %s...\n",interface_name);
 
