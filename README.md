@@ -62,5 +62,5 @@ The program can be controlled two ways:
 ## Class UML
 
 <p align="center">
-  <img src="DCS_Class_UML.png" alt="Class UML" width="1080">
+  <img src="DCS_Class_UML.png" alt="Class UML">
 </p>
