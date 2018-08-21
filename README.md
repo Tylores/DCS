@@ -2,7 +2,7 @@
 
 ## Dependancies
 ### System
-```bash
+```shell
 sudo apt-get update
 sudo apt-get install git
 sudo apt-get install build-essential gcc g++ cmake make
