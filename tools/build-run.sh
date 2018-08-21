@@ -10,8 +10,8 @@ export AJINC=$AJ_ROOT/build/linux/$CPU/$VARIANT/dist/cpp/inc
 export LD_LIBRARY_PATH=$AJLIB:$LD_LIBRARY_PATH
 
 # build
-src=dcs
-make -C ../$src
+export SRC=dcs
+make -C ../build
 
 # run
-./../$src/bin/debug/DCS -c ../data/config.ini -t 300
+./../build/bin/debug/$SRC -c ../data/config.ini -t 300
