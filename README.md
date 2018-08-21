@@ -21,19 +21,28 @@ scons BINDINGS=cpp WS=off DOCS=html
 #### Test AllJoyn Installation
 ``` console
 export CPU=x86_64
-export OS=linux
-export VARIANT=debug
-export AJ_ROOT=~/src/core-alljoyn
-export AJLIB=$AJ_ROOT/build/linux/$CPU/$VARIANT/dist/cpp/lib
-export LD_LIBRARY_PATH=$AJLIB:$LD_LIBRARY_PATH
+export AJ_LIB=~/src/core-alljoyn/build/linux/$CPU/debug/dist/cpp/lib
+export LD_LIBRARY_PATH=$AJ_LIB:$LD_LIBRARY_PATH
 
-cd $AJLIB
+cd $AJ_LIB
 cd ../bin/samples
 ./AboutService
 ```
+If the BusAttachment/AboutObj succeed, then the installation should be fine.
 
 ## Install
+``` console
+cd ~/dev
+git clone https://github.com/Tylores/DCS
+```
 
-## Setup
+### Setup
+1. Open /DCS/tools/build-run.sh
+2. Modify "CPU" to reflect the system you are working on
+3. Ensure "AJ_ROOT" is correct
 
+``` console
+cd ~/dev/DCS/tools
+./build-run.sh
+```
 ## Use
