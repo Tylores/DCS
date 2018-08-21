@@ -51,7 +51,7 @@ The program can be controlled two ways:
 2. The Command Line Interface (CLI).
 
 ```
-  [Help]
+        [Help]
 > q             quit
 > h             help
 > i <watts>     import power
@@ -62,5 +62,5 @@ The program can be controlled two ways:
 ## Class UML
 
 <p align="center">
-  <img src="DCS_Class_UML.png" alt="Class UML" width="700">
+  <img src="DCS_Class_UML.png" alt="Class UML" width="1080">
 </p>
