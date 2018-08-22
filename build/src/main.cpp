@@ -200,6 +200,9 @@ int main (int argc, char** argv) {
     cout << "\nStarting Program...\n";
     cout << "\n\tLoading parameters...\n";
 
+    el::configuration conf ("../data/easy_logger.conf");
+    el::Loggers::reconfigureLogger("default", conf);
+
     if (argc == 1) {
         // this means no arguments were given
         string name = argv[0];
