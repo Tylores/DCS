@@ -161,16 +161,6 @@ static bool CommandLineInterface (const string& input,
     return false;
 }  // end Command Line Interface
 
-void InterfaceLoop (DistributedEnergyResource *DER) {
-    Help ();
-    string input;
-
-    while (!done) {
-        getline(cin, input);
-        done = CommandLineInterface(input, DER);
-    }
-} // end Interface Loop
-
 void ResourceLoop (DistributedEnergyResource *DER) {
     unsigned int time_remaining, time_past;
     unsigned int time_wait = 500;
@@ -199,9 +189,6 @@ void ResourceLoop (DistributedEnergyResource *DER) {
 int main (int argc, char** argv) {
     cout << "\nStarting Program...\n";
     cout << "\n\tLoading parameters...\n";
-
-    el::configuration conf ("../data/easy_logger.conf");
-    el::Loggers::reconfigureLogger("default", conf);
 
     if (argc == 1) {
         // this means no arguments were given
@@ -303,16 +290,19 @@ int main (int argc, char** argv) {
     about_ptr->Announce(port, about_data);
 
     cout << "\nProgram initialization complete...\n";
-    thread CLI(InterfaceLoop, der_ptr);
     thread DER(ResourceLoop, der_ptr);
 
+    Help ();
+    string input;
+
     while (!done) {
-        this_thread::sleep_for (chrono::milliseconds (1000));
+        getline(cin, input);
+        done = CommandLineInterface(input, der_ptr);
+        sgd_ptr->SendPropertiesUpdate ();
     }
 
     cout << "\nProgram shutting down...\n";
     cout << "\n\t Joining threads...\n";
-    CLI.join();
     DER.join();
 
     cout << "\n\t deleting pointers...\n";

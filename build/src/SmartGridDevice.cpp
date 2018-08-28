@@ -92,3 +92,16 @@ QStatus SmartGridDevice::Get (const char* interface,
         return ER_FAIL;
     }
 } // end Get
+
+QStatus SmartGridDevice::SendPropertiesUpdate () {
+const char* props[] = {"export_power",
+                        "export_energy",
+                        "export_ramp",
+                        "import_power",
+                        "import_energy",
+                        "import_ramp",
+                        "idle_losses"};
+    QStatus status;
+    status = EmitPropChanged (interface_, props, 7, ajn::SESSION_ID_ALL_HOSTED);
+    return status;
+}

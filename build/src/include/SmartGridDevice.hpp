@@ -33,14 +33,19 @@ public:
     SmartGridDevice (DistributedEnergyResource* der,
                      ajn::BusAttachment* bus, 
                      const char* name, 
-                     const char* path);
+                     const char* path
+    );
     void ImportPowerHandler (const ajn::InterfaceDescription::Member* member,
-                             ajn::Message& message);
+                             ajn::Message& message
+    );
     void ExportPowerHandler (const ajn::InterfaceDescription::Member* member,
-                             ajn::Message& message);
+                             ajn::Message& message
+    );
     QStatus Get (const char* interface, 
                  const char* property, 
-                 ajn::MsgArg& value);
+                 ajn::MsgArg& value
+    );
+    QStatus SendPropertiesUpdate ();
 
 private:
     // member properties
