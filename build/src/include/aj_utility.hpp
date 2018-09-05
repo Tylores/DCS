@@ -196,7 +196,7 @@ static QStatus BuildServerInterface (std::string name,
 
 // SetupBusAttachment
 // - start/connect to alljoyn message bus and build the server/device interfaces
-static QStatus SetupBusAttachment (const tsu::config_map& ini_map,
+static QStatus SetupBusAttachment (tsu::config_map& ini_map,
                                    ajn::SessionPort& port,
                                    ajn::SessionPortListener& SPL,
                                    ajn::BusAttachment* bus_ptr,
@@ -216,16 +216,12 @@ static QStatus SetupBusAttachment (const tsu::config_map& ini_map,
     }
 
     printf("\n\t\t\tBuilding server interface...\n");
-    std::string server_interface = tsu::GetSectionProperty (ini_map,
-                                                       "AllJoyn",
-                                                       "server_interface");
+    std::string server_interface = ini_map["AllJoyn"]["server_interface"];
     status = aj_utility::BuildServerInterface (server_interface, &bus_ref);
     assert (status == ER_OK);
 
     printf("\n\t\t\tBuilding device interface...\n");
-    std::string device_interface = tsu::GetSectionProperty (ini_map,
-                                                       "AllJoyn",
-                                                       "device_interface");
+    std::string device_interface = ini_map["AllJoyn"]["device_interface"];
     status = aj_utility::BuildDeviceInterface (device_interface, &bus_ref);
     assert (status == ER_OK);
 

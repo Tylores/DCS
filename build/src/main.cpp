@@ -221,7 +221,7 @@ int main (int argc, char** argv) {
     #endif // ROUTER
 
     cout << "\n\t\tCreating message bus...\n";
-    string app_name = tsu::GetSectionProperty(ini_map, "AllJoyn", "app");
+    string app_name = ini_map["AllJoyn"]["app"];
     bool allow_remote = true;
     BusAttachment *bus_ptr = new BusAttachment(app_name.c_str(), allow_remote);
     assert(bus_ptr != NULL);
@@ -233,8 +233,7 @@ int main (int argc, char** argv) {
 
     cout << "\n\t\tEstablishing session port...\n";
     aj_utility::SessionPortListener SPL;
-    string port_number = tsu::GetSectionProperty(ini_map, "AllJoyn", "port");
-    SessionPort port = stoul(port_number);
+    SessionPort port = stoul(ini_map["AllJoyn"]["port"]);
 
     cout << "\n\t\tSetting up bus attachment...\n";
     QStatus status = aj_utility::SetupBusAttachment (ini_map,
@@ -250,36 +249,29 @@ int main (int argc, char** argv) {
     }
 
     cout << "\n\t\tLooking for resource...\n";
-
     DistributedEnergyResource *der_ptr = 
         new DistributedEnergyResource (ini_map["DER"]);
 
     cout << "\n\t\tCreating observer...\n";
-    string server_interface = tsu::GetSectionProperty(ini_map,
-                                                      "AllJoyn",
-                                                      "server_interface");
-    const char *server_name = server_interface.c_str();
+    string server_interface = ini_map["AllJoyn"]["server_interface"];
+    const char* server_name = server_interface.c_str();
     Observer *obs_ptr = new Observer(*bus_ptr, &server_name, 1);
 
     cout << "\n\t\tCreating listener...\n";
     ServerListener *listner_ptr = new ServerListener(bus_ptr,
                                                      obs_ptr,
-                                                     server_name);
+                                                     server_interface.c_str());
     obs_ptr->RegisterListener(*listner_ptr);
 
     cout << "\n\t\tCreating bus object...\n";
-    string device_interface = tsu::GetSectionProperty(ini_map,
-                                                      "AllJoyn",
-                                                      "device_interface");
+    string device_interface = ini_map["AllJoyn"]["device_interface"];
     const char *device_name = device_interface.c_str();
 
-    string path_str = tsu::GetSectionProperty(ini_map, "AllJoyn", "path");
-    const char *path = path_str.c_str();
-
+    string path = ini_map["AllJoyn"]["path"];
     SmartGridDevice *sgd_ptr = new SmartGridDevice(der_ptr, 
                                                    bus_ptr, 
                                                    device_name, 
-                                                   path);
+                                                   path.c_str());
 
     cout << "\n\t\t\tRegistering bus object...\n";
     if (ER_OK != bus_ptr->RegisterBusObject(*sgd_ptr)){
