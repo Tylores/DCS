@@ -190,16 +190,8 @@ int main (int argc, char** argv) {
     cout << "\nStarting Program...\n";
     cout << "\n\tLoading parameters...\n";
 
-    if (argc == 1) {
-        // this means no arguments were given
-        string name = argv[0];
-        CommandLineHelp(name);
-        return EXIT_FAILURE;
-    }
-    map<string, string> parameters = CommandLineParse(argc, argv);
-
     cout << "\n\tMapping configuration file...\n";
-    string config_file = parameters.at("config");
+    string config_file = "../data/config.ini";
     tsu::config_map ini_map = tsu::MapConfigFile(config_file);
 
     cout << "\n\tStarting AllJoyn...\n";
