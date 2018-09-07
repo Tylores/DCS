@@ -8,17 +8,26 @@ sudo apt-get upgrade
 sudo apt-get install git build-essential gcc g++ cmake make xsltproc scons doxygen graphviz libgtk2.0-dev libssl-dev libxml2-dev libcap-dev
 mkdir ~/dev ~/src
 ```
-
 ### AllJoyn
+First clone the AllJoyn repository into your /src folder. The run the following "scons" command that corresponds to your processor. 
 ``` console
 cd ~/src
 git clone https://github.com/alljoyn/core-alljoyn
-
 cd core-alljoyn
+```
+
+#### x86 and x86_64 processors
+``` console
 scons BINDINGS=cpp WS=off DOCS=html
 ```
 
+#### ARM processors
+``` console
+scons OS=linux CPU=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- BINDINGS=cpp WS=off DOCS=html
+```
+
 #### Test AllJoyn Installation
+Note: the CPU variable is dependant on your system. 
 ``` console
 export CPU=x86_64
 export AJ_LIB=~/src/core-alljoyn/build/linux/$CPU/debug/dist/cpp/lib
