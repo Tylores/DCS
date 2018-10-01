@@ -184,6 +184,29 @@ void ResourceLoop (DistributedEnergyResource *DER) {
     }
 }  // end Resource Loop
 
+void SmartGridDeviceLoop (SmartGridDevice *SGD) {
+    unsigned int time_remaining, time_past;
+    unsigned int time_wait = 1000;
+    auto time_start = chrono::high_resolution_clock::now();
+    auto time_end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> time_elapsed;
+
+    while (!done) {
+        time_start = chrono::high_resolution_clock::now();
+            // time since last control call;
+            time_elapsed = time_start - time_end;
+            time_past = time_elapsed.count();
+            SGD->SendPropertiesUpdate ();
+        time_end = chrono::high_resolution_clock::now();
+        time_elapsed = time_end - time_start;
+
+        // determine sleep duration after deducting process time
+        time_remaining = (time_wait - time_elapsed.count());
+        time_remaining = (time_remaining > 0) ? time_remaining : 0;
+        this_thread::sleep_for (chrono::milliseconds (time_remaining));
+    }
+}  // end Smart Grid Device
+
 // Main
 // ----
 int main (int argc, char** argv) {
@@ -275,6 +298,7 @@ int main (int argc, char** argv) {
 
     cout << "\nProgram initialization complete...\n";
     thread DER(ResourceLoop, der_ptr);
+    thread SGD(SmartGridDeviceLoop, sgd_ptr);
 
     Help ();
     string input;
@@ -287,7 +311,8 @@ int main (int argc, char** argv) {
 
     cout << "\nProgram shutting down...\n";
     cout << "\n\t Joining threads...\n";
-    DER.join();
+    DER.join ();
+    SGD.join ();
 
     cout << "\n\t deleting pointers...\n";
     delete der_ptr;

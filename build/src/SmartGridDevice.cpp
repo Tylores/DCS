@@ -44,6 +44,7 @@ void SmartGridDevice::ImportPowerHandler (
         const ajn::InterfaceDescription::Member* member,
         ajn::Message& message) {
     (void)member;
+    std::cout << "[ALLJOYN]: Import...\t" << message->GetArg(0)->v_uint32 << std::endl;
     der_->SetImportWatts (message->GetArg(0)->v_uint32);
 }  // end Import Power Handler
 
@@ -53,6 +54,7 @@ void SmartGridDevice::ExportPowerHandler (
         const ajn::InterfaceDescription::Member* member,
         ajn::Message& message) {
     (void)member;
+    std::cout << "[ALLJOYN]: Export...\t" << message->GetArg(0)->v_uint32 << std::endl;
     der_->SetExportWatts (message->GetArg(0)->v_uint32);
 }  // end Export Power Handler
 
