@@ -69,8 +69,14 @@ QStatus SmartGridDevice::Get (const char* interface,
         return ER_FAIL;
     }
 
-    if (!strcmp(property,"import_power")) {
+    if (!strcmp(property,"rated_import_power")) {
         status = value.Set("u", der_->GetRatedImportPower ());
+        return status;
+    } else if (!strcmp(property,"rated_import_energy")) {
+        status = value.Set("u", der_->GetRatedImportEnergy ());
+        return status;
+    } else if (!strcmp(property,"import_power")) {
+        status = value.Set("u", der_->GetImportPower ());
         return status;
     } else if (!strcmp(property,"import_energy")) {
         status = value.Set("u", der_->GetImportEnergy ());
@@ -78,8 +84,14 @@ QStatus SmartGridDevice::Get (const char* interface,
     } else if (!strcmp(property,"import_ramp")) {
         status = value.Set("u", der_->GetImportRamp ());
         return status;
-    }else if (!strcmp(property,"export_power")) {
+    } else if (!strcmp(property,"rated_export_power")) {
         status = value.Set("u", der_->GetRatedExportPower ());
+        return status;
+    } else if (!strcmp(property,"rated_export_energy")) {
+        status = value.Set("u", der_->GetRatedExportEnergy ());
+        return status;
+    } else if (!strcmp(property,"export_power")) {
+        status = value.Set("u", der_->GetExportPower ());
         return status;
     } else if (!strcmp(property,"export_energy")) {
         status = value.Set("u", der_->GetExportEnergy ());
@@ -96,14 +108,18 @@ QStatus SmartGridDevice::Get (const char* interface,
 } // end Get
 
 QStatus SmartGridDevice::SendPropertiesUpdate () {
-const char* props[] = {"export_power",
+const char* props[] = { "rated_export_power",
+                        "export_power",
+                        "rated_export_energy",
                         "export_energy",
                         "export_ramp",
+                        "rated_import_power",
                         "import_power",
+                        "rated_import_energy",
                         "import_energy",
                         "import_ramp",
                         "idle_losses"};
     QStatus status;
-    status = EmitPropChanged (interface_, props, 7, ajn::SESSION_ID_ALL_HOSTED);
+    status = EmitPropChanged (interface_, props, 11, ajn::SESSION_ID_ALL_HOSTED);
     return status;
 }

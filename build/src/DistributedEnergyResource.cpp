@@ -2,17 +2,17 @@
 
 DistributedEnergyResource::DistributedEnergyResource (
     std::map <std::string, std::string> init) :
-    rated_export_power_(stoul(init["ExportPower"])),
-    rated_export_energy_(stoul(init["ExportEnergy"])),
+    rated_export_power_(stoul(init["RatedExportPower"])),
+    rated_export_energy_(stoul(init["RatedExportEnergy"])),
     export_ramp_(stoul(init["ExportRamp"])),
-    rated_import_power_(stoul(init["ImportPower"])),
-    rated_import_energy_(stoul(init["ImportEnergy"])),
+    rated_import_power_(stoul(init["RatedImportPower"])),
+    rated_import_energy_(stoul(init["RatedImportEnergy"])),
     import_ramp_(stoul(init["ImportRamp"])),
     idle_losses_(stoul(init["IdleLosses"])),
-    export_power_(0),
-    export_energy_(rated_export_energy_),
-    import_power_(0),
-    import_energy_(0),
+    export_power_(stoul(init["ExportPower"])),
+    export_energy_(stoul(init["ExportEnergy"])),
+    import_power_(stoul(init["ImportPower"])),
+    import_energy_(stoul(init["ImportEnergy"])),
     export_watts_(0),
     import_watts_(0),
     delta_time_(0) {
@@ -100,6 +100,12 @@ unsigned int DistributedEnergyResource::GetExportPower () {
     return power;
 }  // end Get Export Power
 
+// Get Rated Export Energy
+// - get the watt value available to import from the grid
+unsigned int DistributedEnergyResource::GetRatedExportEnergy () {
+    return rated_export_energy_;
+}  // end Rated Export energy
+
 // Get Export Energy
 // - get the watt-hour value available to export to the grid
 unsigned int DistributedEnergyResource::GetExportEnergy () {
@@ -125,6 +131,12 @@ unsigned int DistributedEnergyResource::GetImportPower () {
     unsigned int power = import_power_;
     return power;
 }  // end Get Import Power
+
+// Get Rated Import Energy
+// - get the watt value available to import from the grid
+unsigned int DistributedEnergyResource::GetRatedImportEnergy () {
+    return rated_import_energy_;
+}  // end Rated Import energy
 
 // Get Import Energy
 // - get the watt-hour value available to import from the grid

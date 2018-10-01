@@ -33,12 +33,14 @@ class DistributedEnergyResource {
         // get export methods
         unsigned int GetRatedExportPower ();
         unsigned int GetExportPower ();
+        unsigned int GetRatedExportEnergy ();
         unsigned int GetExportEnergy ();
         unsigned int GetExportRamp ();
 
         // get import methods
         unsigned int GetRatedImportPower ();
         unsigned int GetImportPower ();
+        unsigned int GetRatedImportEnergy ();
         unsigned int GetImportEnergy ();
         unsigned int GetImportRamp ();
         
