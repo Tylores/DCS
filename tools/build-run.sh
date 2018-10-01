@@ -1,4 +1,5 @@
 #!/bin/bash
+# kevins tools
 
 # setup environment
 export CPU=x86_64
