@@ -31,7 +31,7 @@
 #include <alljoyn/Observer.h>
 #include <alljoyn/Init.h>
 
-#include "ts_utility.hpp"
+#include "tsu.h"
 
 namespace aj_utility {
 
