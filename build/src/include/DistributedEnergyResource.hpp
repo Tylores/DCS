@@ -9,11 +9,11 @@ class DistributedEnergyResource {
         // constructor / destructor
         DistributedEnergyResource (std::map <std::string, std::string> init);
         virtual ~DistributedEnergyResource ();
-        void Loop (float delta_time);
+        virtual void Loop (float delta_time);
 
 
     public:
-        // set export methods        
+        // set export methods
         void SetExportWatts (unsigned int power);
         void SetRatedExportPower (unsigned int watts);
         void SetRatedExportEnergy (unsigned int watt_hours);
@@ -27,7 +27,7 @@ class DistributedEnergyResource {
 
         // set idle methods
         void SetIdleLosses (unsigned int energy_per_hour);
-        
+
 
     public:
         // get export methods
@@ -43,15 +43,15 @@ class DistributedEnergyResource {
         unsigned int GetRatedImportEnergy ();
         unsigned int GetImportEnergy ();
         unsigned int GetImportRamp ();
-        
+
         // get idle methods
         unsigned int GetIdleLosses ();
 
     private:
         // controls
-        void ImportPower ();
-        void ExportPower ();
-        void IdleLoss ();
+        virtual void ImportPower ();
+        virtual void ExportPower ();
+        virtual void IdleLoss ();
 
     private:
         // rated export properties
@@ -63,7 +63,7 @@ class DistributedEnergyResource {
         unsigned int rated_import_power_;       // (W) from grid
         unsigned int rated_import_energy_;      // (Wh)
         unsigned int import_ramp_;              // (W s^-1)
-        
+
         // rated idle properties
         unsigned int idle_losses_;              // (Wh h^-1)
 
@@ -72,7 +72,7 @@ class DistributedEnergyResource {
         float export_power_;
         float export_energy_;
         float import_power_;
-        float import_energy_;     
+        float import_energy_;
 
     private:
         // control properties
